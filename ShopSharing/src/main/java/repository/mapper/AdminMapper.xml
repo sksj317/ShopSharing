@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.AdminMapper">
+
+<cache/>
+	<resultMap type="AdminCommand" id="postPmResultMap">
+		<id column="member_id" jdbcType="VARCHAR" property="memberId" />
+		<result column="post_num" jdbcType="BIGINT" property="postNum" />
+		<result column="name" jdbcType="VARCHAR" property="postName" />
+		<result column="regdate" jdbcType="TIMESTAMP" property="postReg"/>
+		<result column="post_distinct" jdbcType="VARCHAR" property="postDistinct"/>
+	</resultMap>
+	<select id="selectNotPermissionPost" parameterType="AdminCommand" resultMap="postPmResultMap">
+		SELECT  member_id, shop_num as post_num, shop_name as name, shop_reg as regdate, shop_distinct as post_distinct
+		FROM shop
+		WHERE shop_permission = 0
+		UNION ALL
+		SELECT member_id, goods_num as post_num, goods_name as name, goods_reg as regdate, goods_distinct as post_distinct
+		FROM goods
+		WHERE goods_permission = 0
+	</select>
+	
+	<update id="permissionUpdateShop" parameterType="Long">
+		UPDATE shop
+		SET shop_permission = 1
+		WHERE shop_num = #{s}
+	</update>
+	<update id="permissionUpdateGoods" parameterType="Long">
+		UPDATE goods
+		SET goods_permission = 1
+		WHERE goods_num = #{g}
+	</update>
+	
+	<delete id="denyDeleteShop" parameterType="long">
+		DELETE FROM shop
+		WHERE shop_num = #{s}
+	</delete>
+	<delete id="denyDeleteGoods" parameterType="long">
+		DELETE FROM goods
+		WHERE goods_num = #{g}
+	</delete>
+	<insert id="insertSQna" parameterType="SQna">
+		INSERT INTO service_qna(S_QNA_NUM, MEMBER_ID, S_QNA_SUB, S_QNA_DETAIL, S_QNA_REG)
+		VALUES(#{sQnaNum}, #{memberId}, #{sQnaSub}, #{sQnaDetail}, #{sQnaReg})
+	</insert>
+	
+	<select id="selectSQnaNum" resultType="long">
+			select count(s_qna_num) from service_qna
+	</select>
+	
+	<resultMap type="SQna" id="sQnaListResult">
+		<id column="s_qna_num" jdbcType="BIGINT" property="sQnaNum"/>
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="s_qna_reg" jdbcType="TIMESTAMP" property="sQnaReg"/>
+		<result column="s_qna_sub" jdbcType="VARCHAR" property="sQnaSub"/>
+		<result column="s_qna_detail" jdbcType="VARCHAR" property="sQnaDetail"/>
+	</resultMap>
+	<select id="selectSQnaList" resultMap="sQnaListResult">
+		SELECT s_qna_num, member_id, s_qna_reg, s_qna_sub, s_qna_detail
+		FROM service_qna
+	</select>
+	
+	<select id="shopPostCnt" resultType="Integer">
+			select count(shop_num) from shop where shop_permission = 0
+	</select>
+	<select id="goodsPostCnt" resultType="Integer">
+			select count(goods_num) from goods where goods_permission = 0
+	</select>
+	<select id="qnaCnt" resultType="Integer">
+			select count(s_qna_num) from service_qna where s_qna_reg = sysdate
+	</select>
+	<select id="shareContractCnt" resultType="Integer">
+			select count(share_con_num) from share_con
+	</select>
+	<select id="consignContractCnt" resultType="Integer">
+			select count(consign_con_num) from consign_con
+	</select>
+	<select id="todayMbrCnt" resultType="Integer">
+			select count(member_id) from member where member_reg = sysdate
+	</select>
+</mapper>

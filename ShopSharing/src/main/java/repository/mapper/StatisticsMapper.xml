@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.StatisticsMapper">
+<cache />
+	 
+	<resultMap type="CustomCommand" id="CustomSurveys">
+		<id column="CSURVEY_NUM" jdbcType="BIGINT" property="csurveyNum" />
+		<result column="MEMBER_ID" jdbcType="VARCHAR" property="memberId" />
+		<result column="SATI_STAR" jdbcType="DOUBLE" property="satiStar" />
+		<result column="QUAN_STAR" jdbcType="DOUBLE" property="quanStar" />
+		<result column="PRICE_STAR" jdbcType="DOUBLE" property="priceStar" />
+		<result column="TASTE_STAR" jdbcType="DOUBLE" property="tasteStar" />
+		<result column="VISIT_STAR" jdbcType="DOUBLE" property="visitStar" />
+		<result column="CUSTOM_DATE" jdbcType="TIMESTAMP" property="customDate" />
+		<result column="CUSTOM_COMMENT" jdbcType="VARCHAR" property="customComment" />
+	</resultMap> 
+	
+	<select id="selectCustomSurveyById" parameterType="CustomCommand" resultMap="CustomSurveys">
+		SELECT *
+		FROM CUSTOMERSURVEY
+		<where>
+			<if test="memberId != null">
+				MEMBER_ID = #{memberId}
+			</if>
+		</where>
+	</select>
+	
+	<!-- as로 적어주면 resultType을 사용할 수 있다 >> resultMap을 안써도 된다!!! -->
+	<select id="getCustomerVoice" resultType="SurveyCommand">
+		SELECT member_id as memberId,
+ 			   survey_num as surveyNum, 
+		       survey_date as surveyDate, 
+		       service_complaint as serviceComplaint, 
+			   survey_Comment as surveyComment
+		FROM survey
+	</select>
+	
+	<update id="updateMemberGrade" parameterType="String">
+		UPDATE MEMBER
+		SET member_grade = '우수회원'
+		WHERE member_id = #{contractPartnerId}
+	</update>
+	
+	<update id="updateMemberPointAverType" parameterType="Member">
+		UPDATE MEMBER
+		SET member_pointAver = (member_point + #{memberPoint}) / (member_PointCount + 1), member_type = #{memberType}, 
+			member_point = member_point + #{memberPoint}, member_PointCount = member_PointCount + 1
+		WHERE member_id = #{memberId}
+	</update>
+	
+	<select id="getTopFiveSharerRanking" resultType="Member">
+		<![CDATA[
+			SELECT * 
+			FROM(SELECT rownum rnum,
+			   member_id as memberId,
+			   member_grade as memberGrade, 
+		       member_type as memberType, 
+		       member_pointAver as memberPointAver
+			   FROM (SELECT * FROM MEMBER order by member_pointAver desc))  
+			where rnum >= 1 and rnum <= 5
+		]]> 
+	</select>
+	
+	<select id="getTopFivePopularStores" resultType="Shop">
+		<![CDATA[
+			SELECT * 
+			FROM(SELECT rownum rnum,
+			   shop_num as shopNum,
+			   shop_name as shopName,
+			   shop_type as shopType,
+			   shop_lent_type as shopLentType, 
+		       shop_month as shopMonth, 
+		       shop_read_count as shopReadCount
+			   FROM (SELECT * FROM shop order by shop_read_count desc))  
+			where rnum >= 1 and rnum <= 5
+		]]> 
+	</select>
+	
+	<select id="selectMemberInChart" parameterType="String" resultType="Member">
+		SELECT member_id as memberId, 
+			   member_reg as memberReg,
+			   member_ph as memberPh,
+			   member_grade as memberGrade,
+			   member_pointAver as memberPointAver
+		FROM member
+		WHERE member_id = #{memberId}
+	</select>
+	
+	<select id="selectContractPartnerIdFromProvider" parameterType="SurveyCommand" resultType="String">
+		SELECT member_id2
+		FROM share_con
+		WHERE member_id = #{memberId} AND shop_name = #{shopName}
+	</select>
+	
+	<select id="selectContractPartnerIdFromLender" parameterType="surveyCommand" resultType="String">
+		SELECT member_id
+		FROM share_con
+		WHERE member_id2 = #{memberId} AND shop_name = #{shopName}
+	</select>
+	
+	<select id="selectContractPartnerIdFromConsign" parameterType="surveyCommand" resultType="String">
+		SELECT member_id2
+		FROM consignment
+		WHERE member_id = #{memberId} AND shop_name = #{shopName}
+	</select>
+	
+	<select id="isNotNullCon" parameterType="String" resultType="Integer">
+		SELECT count(share_con_num)
+		FROM share_con
+		WHERE member_id = #{id} 
+	</select>
+	
+	<select id="isNotNullConFromLender" parameterType="String" resultType="Integer">
+		SELECT count(share_con_num)
+		FROM share_con
+		WHERE member_id2 = #{id} 
+	</select>
+	
+	<select id="isNotNullConsignCon" parameterType="String" resultType="Integer">
+		SELECT count(consignment_num)
+		FROM consignment
+		WHERE member_id = #{id} 
+	</select>
+	
+</mapper>

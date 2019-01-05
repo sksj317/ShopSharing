@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.ReplyMapper">
+<cache/>
+	<insert id = "insertGoodsReply" parameterType="model.GoodsReply">
+		 <selectKey resultType="int" keyProperty="goodsReplyNum" order="BEFORE">
+             SELECT (goods_reply_num.nextval) FROM dual
+         </selectKey>
+         insert into goodsReply(goods_Reply_num, goods_member_id, goods_num, goods_reply_id, goods_reply_date, goods_reply_content)
+         values(#{goodsReplyNum},#{goodsMemberId},#{goodsNum},#{goodsReplyId},#{goodsReplyDate},#{goodsReplyContent})
+	</insert>
+	<select id="goodsReplyList" resultType="model.GoodsReply">
+	select 
+		goods_reply_num as goodsReplyNum,
+		goods_member_id as goodMemberId,
+		goods_num as goodsNum,
+		goods_reply_id as goodsReplyId,
+		goods_reply_date as goodsReplyDate,
+		goods_reply_content as goodsReplyContent
+	from goodsReply
+	where goods_num = #{goodsNum}
+	</select>
+	<insert id = "insertShopReply" parameterType="ShopReply">
+		 <selectKey resultType="int" keyProperty="shopReplyNum" order="BEFORE">
+             SELECT (shop_reply_num.nextval) FROM dual
+         </selectKey>
+		insert into shopReply(shop_Reply_Num, shop_member_id, shop_num, shop_reply_id, shop_reply_date, shop_reply_content)
+		values(#{shopReplyNum},  #{shopMemberId}, #{shopNum}, #{shopReplyId}, #{shopReplyDate}, #{shopReplyContent})
+	</insert>
+	
+	<select id ="listReply" resultType="model.ShopReply">
+		select
+		shop_Reply_num as shopReplyNum,
+			shop_Member_Id as shopMemberId,
+			shop_Num as shopNum,
+			shop_Reply_Id as shopReplyId,
+			shop_Reply_Date as shopReplyDate,
+			shop_Reply_Content as shopReplyContent
+		FROM shopReply
+		where shop_num = #{shopNum}
+	</select>
+	<delete id="shopReplyDelete" parameterType="ShopReply">
+		delete from shopReply where shop_Reply_Num = #{shopReplyNum}
+	</delete>
+	<delete id ="goodsReplyDelete" parameterType="GoodsReply">
+		delete from goodsReply where goods_Reply_Num = #{goodsReplyNum}
+	</delete>
+</mapper>

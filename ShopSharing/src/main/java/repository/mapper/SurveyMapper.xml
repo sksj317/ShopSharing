@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.SurveyMapper">
+<cache />
+
+	<insert id="insertSharingSurveyNum" parameterType="SurveyCommand">
+		
+		insert into survey(SURVEY_NUM, SHOP_NAME, MEMBER_ID, SERVICE_STAR, MUTUAL_STAR, FACILITY_STAR, SURVEY_RECHARTER, SURVEY_DATE, SURVEY_COMMENT, MEMBER_TYPE, SURVEY_SERVICECOMPLAINT)
+		values(#{surveyNum}, #{shopName}, #{memberId}, #{serviceStar}, #{mutualStar}, #{facilitiesStar}, #{surveyRecharter}, #{surveyDate}, #{surveyComment}, #{memberType}, #{serviceComplaint})
+	
+	</insert>
+	
+	<select id="selectSharingSurvey" resultType="Long">
+	
+		select count(survey_num) from SURVEY
+	
+	</select>
+	
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.RequestMapper">
+	<resultMap type="ShareReq" id="sendShareReqList">
+		<id column="share_req_num" jdbcType="BIGINT" property="shareReqNum" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="shop_num" jdbcType="BIGINT" property="shopNum"/>
+		<result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="share_req_apply_day" jdbcType="TIMESTAMP" property="shareReqApplyDay"/>
+		<result column="share_req_permission" jdbcType="VARCHAR" property="shareReqPermission"/>
+	</resultMap>
+	<select id="selectMySendShareReqList" parameterType="ShareReq" resultMap="sendShareReqList">
+		SELECT sr.share_req_num, sr.member_id, sr.shop_num, s.shop_name, sr.member_id2, sr.share_req_apply_day, sr.share_req_permission
+		FROM share_req sr JOIN shop s
+		ON sr.shop_num = s.shop_num
+        WHERE sr.member_id2 = #{memberId}		
+	</select>
+	
+	<resultMap type="Consignment" id="consignmentList">
+		<id column="consignment_num" jdbcType="BIGINT" property="consignmentNum" />
+		<result column="goods_num" jdbcType="BIGINT" property="goodsNum"/>
+		<result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="consignment_apply_day" jdbcType="TIMESTAMP" property="consignmentApplyDay"/>
+	</resultMap>
+	<select id="selectMySendConsignmentList" parameterType="Consignment" resultMap="consignmentList">
+		SELECT cs.consignment_num, cs.goods_num, g.goods_name, cs.member_id, cs.member_id2, cs.consignment_apply_day
+		FROM consignment cs JOIN goods g
+		ON cs.goods_num = g.goods_num
+		WHERE cs.member_id2 = #{memberId}
+	</select>
+	
+	
+	<resultMap type="ShareReq" id="shareReqList">
+		<id column="share_req_num" jdbcType="BIGINT" property="shareReqNum" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="shop_num" jdbcType="BIGINT" property="shopNum"/>
+		<result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="share_req_apply_day" jdbcType="TIMESTAMP" property="shareReqApplyDay"/>
+		<result column="share_req_permission" jdbcType="VARCHAR" property="shareReqPermission"/>
+	</resultMap>
+	<select id="selectMyShareReqList" parameterType="ShareReq" resultMap="shareReqList">
+		SELECT sr.share_req_num, sr.member_id, sr.shop_num, s.shop_name, sr.member_id2, sr.share_req_apply_day, sr.share_req_permission
+		FROM share_req sr JOIN shop s
+		ON sr.shop_num = s.shop_num
+        WHERE sr.member_id = #{memberId} and sr.share_req_permission = 2		
+	</select>
+	
+	<resultMap type="Consignment" id="conReqList">
+		<id column="consignment_num" jdbcType="BIGINT" property="consignmentNum" />
+		<result column="goods_num" jdbcType="BIGINT" property="goodsNum"/>
+		<result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="consignment_apply_day" jdbcType="TIMESTAMP" property="consignmentApplyDay"/>
+		<result column="consignment_permission" jdbcType="VARCHAR" property="consignmentPermission"/>
+	</resultMap>
+	<select id="selectMyConReqList" parameterType="Consignment" resultMap="conReqList">
+		SELECT cs.consignment_num, cs.goods_num, g.goods_name, cs.member_id, cs.member_id2, cs.consignment_apply_day, cs.consignment_permission
+		FROM consignment cs JOIN goods g
+		ON cs.goods_num = g.goods_num
+		WHERE cs.member_id = #{memberId} and cs.consignment_permission = 2
+	</select>
+	
+	<update id="shareReqPermission" parameterType="Long">
+		UPDATE share_req
+		SET share_req_permission = 1
+		WHERE share_req_num = #{shareReqNum}
+	</update>	
+	<update id="shareReqDeny" parameterType="Long">
+		UPDATE share_req
+		SET share_req_permission = 0
+		WHERE share_req_num = #{shareReqNum}
+	</update>
+	
+	<update id="consignmentPermission" parameterType="Long">
+		UPDATE consignment
+		SET consignment_permission = 1
+		WHERE consignment_num = #{consignmentNum}
+	</update>	
+	<update id="consignmentDeny" parameterType="Long">
+		UPDATE consignment
+		SET consignment_permission = 0
+		WHERE consignment_num = #{consignmentNum}
+	</update>
+	
+	<resultMap type="ConsignCon" id="conConList">
+		<id column="consign_con_num" jdbcType="BIGINT" property="consignConNum" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+		<result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+		<result column="consign_con_start" jdbcType="TIMESTAMP" property="consignConStart"/>
+		<result column="consign_con_exp" jdbcType="TIMESTAMP" property="consignConExp"/>
+		<result column="consign_con_conclusion" jdbcType="TIMESTAMP" property="consignConConclusion"/>
+	</resultMap>
+	<select id="selectMyConsignConList" parameterType="ConsignCon" resultMap="conConList">
+		SELECT consign_con_num, member_id, member_id2, goods_name, shop_name, consign_con_start, consign_con_exp, consign_con_conclusion
+		FROM consign_con
+		WHERE member_id = #{memberId} OR member_id2 = #{memberId}
+	</select>
+	
+	<resultMap type="ShareCon" id="shareConList">
+		<id column="share_con_num" jdbcType="BIGINT" property="shareConNum" />
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+		<result column="share_con_start" jdbcType="TIMESTAMP" property="shareConStart"/>
+		<result column="share_con_exp" jdbcType="TIMESTAMP" property="shareConExp"/>
+		<result column="share_con_conclusion" jdbcType="TIMESTAMP" property="shareConConclusion"/>
+	</resultMap>
+	<select id="selectMyShareConList" parameterType="ShareCon" resultMap="shareConList">
+		SELECT share_con_num, member_id, member_id2, shop_name, share_con_start, share_con_exp, share_con_conclusion
+		FROM share_con
+		WHERE member_id = #{memberId} OR member_id2 = #{memberId}
+	</select>
+<cache/>
+
+</mapper>

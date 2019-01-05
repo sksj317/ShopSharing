@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.CustomMapper">
+
+<cache></cache>
+	
+	<insert id="insertCustomSurvey" parameterType="customCommand">
+		INSERT INTO CUSTOMERSURVEY(csurvey_num, member_id, sati_star, quan_star, price_star, taste_star, visit_star, custom_date, custom_comment)
+		VALUES(#{csurveyNum}, #{memberId}, #{satiStar}, #{quanStar}, #{priceStar}, #{tasteStar}, #{visitStar}, #{customDate}, #{customComment})
+	</insert>
+	
+	<select id="selectCustomSurveyNum" resultType="Long">
+		select count(csurvey_num) from CUSTOMERSURVEY
+	</select>
+
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.ContractMapper">
+
+<cache/>
+	
+	<resultMap type="ShareReq" id="shareReqMap">
+		<id column="SHARE_REQ_NUM" jdbcType="BIGINT" property="shareReqNum"></id>
+		<result column="MEMBER_ID" jdbcType="VARCHAR" property="memberId"/>
+		<result column="SHOP_NUM" jdbcType="BIGINT" property="shopNum"/>
+		<result column="MEMBER_ID2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="SHARE_REQ_APPLY_DAY" jdbcType="DATE" property="shareReqApplyDay"/>
+		<result column="SHARE_REQ_CONTENT" jdbcType="CLOB" property="shareReqContent"/>
+		<result column="SHARE_REQ_START_PERIOD" jdbcType="VARCHAR" property="shareReqStartPeriod"/>
+		<result column="SHARE_REQ_END_PERIOD" jdbcType="VARCHAR" property="shareReqEndPeriod"/>
+		<result column="SHARE_REQ_START_TIME" jdbcType="BIGINT" property="shareReqStartTime"/>
+		<result column="SHARE_REQ_END_TIME" jdbcType="BIGINT" property="shareReqEndTime"/>
+		<result column="SHOP_NAME" jdbcType="VARCHAR" property="shopName"/>
+		<result column="SHOP_DEPOSIT" jdbcType="BIGINT" property="shopDeposit"/>
+		<result column="SHOP_LENT_PAY" jdbcType="BIGINT" property="shopLentPay"/>
+	</resultMap>
+	
+	<!-- 신청 번호 카운트 -->
+	<select id="selectShareReqNum" resultType="long">
+		select count(SHARE_REQ_NUM) from share_req
+	</select>
+	
+	<insert id="insertContract" parameterType="ShareReq">
+		insert into share_req
+		(SHARE_REQ_NUM,MEMBER_ID,SHOP_NUM,MEMBER_ID2,SHARE_REQ_APPLY_DAY,
+		SHARE_REQ_CONTENT,SHARE_REQ_START_PERIOD,SHARE_REQ_END_PERIOD,
+		SHARE_REQ_START_TIME,SHARE_REQ_END_TIME,SHOP_NAME)
+		values
+		(#{shareReqNum},#{memberId},#{shopNum},
+		#{memberId2},#{shareReqApplyDay},#{shareReqContent},#{shareReqStartPeriod},
+		#{shareReqEndPeriod},#{shareReqStartTime},#{shareReqEndTime},#{shopName})
+	</insert>
+	
+	<select id="contractSelect" parameterType="ShareReq" resultMap="shareReqMap">
+ 		select sr.SHARE_REQ_NUM,sr.MEMBER_ID,sr.SHOP_NUM,sr.MEMBER_ID2,sr.SHARE_REQ_APPLY_DAY,
+		sr.SHARE_REQ_CONTENT,sr.SHARE_REQ_START_PERIOD,sr.SHARE_REQ_END_PERIOD,sr.SHARE_REQ_START_TIME,
+		sr.SHARE_REQ_END_TIME,sr.SHOP_NAME,s.SHOP_DEPOSIT,s.SHOP_LENT_PAY,sr.SHARE_REQ_START_TIME,sr.SHARE_REQ_END_TIME
+		from shop s, share_req sr
+		where s.shop_num = sr.shop_num and sr.SHARE_REQ_NUM = #{shareReqNum}
+
+	</select>
+	
+	<select id="selectShareConNum" resultType="long">
+		select count(share_con_num) from share_con
+	</select>
+	
+	<insert id="contractInteger" parameterType="ShareCon">
+		insert into share_con
+		(SHARE_CON_NUM,SHARE_REQ_NUM,MEMBER_ID,SHOP_NUM,MEMBER_ID2,
+		SHARE_CON_CONCLUSION,SHARE_CON_START,SHARE_CON_EXP,SHARE_CON_LENTPAY,
+		SHARE_CON_DEPOSIT,SHARE_BANK_NAME,shop_name)
+		values
+		(#{shareConNum},#{shareReqNum},#{memberId},#{shopNum},
+		#{memberId2},#{shareConConclusion},#{shareConStart},
+		#{shareConExp},#{shareConLentPay},#{shareConDeposit},
+		#{shareBankName},#{shopName})
+	</insert>
+	
+	
+	<resultMap type="Consignment" id="consignMap">
+		<id column="consignment_num" jdbcType="BIGINT" property="consignmentNum"/>
+		<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="goods_num" jdbcType="BIGINT" property="goodsNum"/>
+		<result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+		<result column="shop_num" jdbcType="BIGINT" property="shopNum"/>
+		<result column="shop_name" jdbcType="VARCHAR" property="shopName"/>
+		<result column="member_id2" jdbcType="VARCHAR" property="memberId2"/>
+		<result column="consignment_apply_day" jdbcType="VARCHAR" property="consignmentApplyDay"/>
+		<result column="consignment_content" jdbcType="CLOB" property="consignmentContent"/>
+		<result column="consignment_start_period" jdbcType="VARCHAR" property="consignmentStartPeriod"/>
+		<result column="consignment_end_period" jdbcType="VARCHAR" property="consignmentEndPeriod"/>
+		<result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+		<result column="consignment_amount" jdbcType="BIGINT" property="consignmentAmount"/>
+		<result column="consignment_quantity" jdbcType="BIGINT" property="consignmentQuantity"/>
+	</resultMap>
+	<select id="consignConSelect" parameterType="Consignment" resultMap="consignMap">
+		select cs.consignment_num, cs.member_id, cs.goods_num, g.goods_name, cs.shop_num, cs.shop_name, cs.member_id2, cs.consignment_apply_day,
+		cs.consignment_start_period, cs.consignment_end_period, 
+		cs.consignment_amount, cs.consignment_quantity
+		from goods g, consignment cs
+		where g.goods_num = cs.goods_num and cs.consignment_num = #{consignmentNum}
+	</select>
+	
+	<select id="selectConsignConNum" resultType="long">
+		select count(consign_con_num) from consign_con
+	</select>
+	<insert id="consignConInsert" parameterType="ConsignConCommand">
+		insert into consign_con
+		(CONSIGN_CON_NUM,CONSIGNMENT_NUM,MEMBER_ID,GOODS_NUM,MEMBER_ID2,SHOP_NUM, 
+		CONSIGN_CON_CONCLUSION,CONSIGN_CON_START,CONSIGN_CON_EXP,CONSIGN_CON_PAY,
+		CONSIGN_CON_QUANTITY,CONSIGN_BANK_NAME,shop_name)
+		values
+		(#{consignConNum},#{consignmentNum},#{memberId},#{goodsNum},
+		#{memberId2},#{shopNum},#{consignConConclusion},#{consignmentStartPeriod},
+		#{consignmentEndPeriod},#{consignmentAmount},#{consignmentQuantity},#{consignBankName},#{shopName})
+	</insert>
+</mapper>

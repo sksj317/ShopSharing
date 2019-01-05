@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.ConsignmentMapper">
+
+<cache/>
+	
+	<select id="isNotNullShopCheck" resultType="Long" parameterType="String">
+			select count(shop_num) 
+			from Shop
+			where member_Id = #{memberId2} 
+	</select>
+	
+	<select id="getShopNum" resultType="Long" parameterType="String">
+			select shop_num
+			from Shop
+			where shop_Name = #{shopName} 
+	</select>
+	
+	<insert id="consignmentReqInsert" parameterType="Consignment">
+		<selectKey resultType="Long" keyProperty="consignmentNum" order="BEFORE">
+             SELECT (consignment_num.nextval) FROM dual
+         </selectKey>
+		insert into Consignment
+		(consignment_num,goods_num,goods_Name,member_id,member_id2,
+		shop_num,shop_name,consignment_start_period,consignment_end_period,
+		consignment_apply_day,consignment_quantity,consignment_amount)
+		values
+		(#{consignmentNum},#{goodsNum},#{goodsName},
+		#{memberId},#{memberId2},#{shopNum},#{shopName},
+		#{consignmentStartPeriod},#{consignmentEndPeriod},#{consignmentApplyDay},#{consignmentQuantity},
+		#{consignmentAmount})
+	</insert>
+	
+</mapper>

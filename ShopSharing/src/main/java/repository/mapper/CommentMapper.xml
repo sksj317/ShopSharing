@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.CommentMapper">
+
+<cache/>
+<!-- 	
+	<insert id="insertComment" parameterType="Comment">
+		INSERT INTO comment1(comment_no, user_id, comment_content, reg_date)
+		values(#{commentNo}, #{userId}, #{commentContent}, #{regDate}) 
+	</insert>
+	
+	<resultMap type="Comment" id="baseResultMap">
+		<id column="comment_no" jdbcType="BIGINT" property="commentNo" />
+		<result column="user_id" jdbcType="VARCHAR" property="userId" />
+		<result column="reg_date" jdbcType="TIMESTAMP" property="regDate" />
+		<result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+	</resultMap>
+	
+	<select id="selectCommentByCondition" parameterType="Comment" resultMap="baseResultMap">
+		SELECT comment_no, user_id, comment_content, reg_date
+		FROM comment1
+		<where>
+			<if test="commentNo != null">
+				comment_no = #{commentNo}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateComment" parameterType="Comment">
+		UPDATE comment1
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userId != null">
+				user_id = #{userId},
+			</if>
+			<if test="commentContent != null">
+				comment_content = #{commentContent}
+			</if>			
+			WHERE comment_no = #{commentNo}
+		</trim>
+	</update>
+	
+	<delete id="deleteComment" parameterType="long">
+		DELETE FROM comment1
+		WHERE comment_no = #{commentNo}
+	</delete>
+	
+	<resultMap type="Reply" id="baseResultMap1">
+		<id column="reply_no" jdbcType="BIGINT" property="replyNo"/>
+		<result column="comment_no" jdbcType="BIGINT" property="commentNo"/>
+		<result column="user_id" jdbcType="VARCHAR" property="userId"/>
+		<result column="reply_content" jdbcType="VARCHAR" property="replyContent"/>
+		<result column="reg_date" jdbcType="TIMESTAMP" property="regDate"/>
+	</resultMap>
+	
+	<select id="ajaxSelect1" resultMap="baseResultMap">		
+		SELECT comment_no, user_id, comment_content, reg_date
+		FROM comment1
+	</select>
+	
+	<select id="ajaxSelect2" resultMap="baseResultMap1">
+		SELECT reply_no, comment_no, reply_content, reg_date, user_id
+		FROM reply
+	</select>
+	
+	<resultMap type="Member" id="memberMap">
+		<constructor>
+		<idArg column="id" javaType="long"/>
+		<arg column="email" javaType="string"/>
+		<arg column="password" javaType="string"/>
+		<arg column="name" javaType="string"/>
+		<arg column="regdate" javaType="date"/>		
+		</constructor>
+	</resultMap>
+	
+	<select id="memberSelect" parameterType="Member" resultMap="memberMap">
+		SELECT id, email, password, name, regdate
+		FROM member
+		WHERE id = #{memberId}
+	</select>
+	
+	<resultMap type="Acat" id="acatMap">
+		<id column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="aname" jdbcType="VARCHAR" property="aname"/>
+	</resultMap>
+	
+	<select id="acatSelect" parameterType="Acat" resultMap="acatMap">
+		SELECT anum, aname
+		FROM acat
+	</select>
+	
+	<resultMap type="Bcat" id="bcatMap">
+		<id column="bnum" jdbcType="BIGINT" property="bnum"/>
+		<result column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="bname" jdbcType="VARCHAR" property="bname"/>
+	</resultMap>
+	
+	<select id="bcatSelect" parameterType="Acat" resultMap="bcatMap">
+		SELECT bnum, anum, bname
+		FROM bcat
+		WHERE anum = #{anum}
+	</select>
+	
+	<resultMap type="Ccat" id="ccatMap">
+		<id column="cnum" jdbcType="BIGINT" property="cnum"/>
+		<result column="bnum" jdbcType="BIGINT" property="bnum"/>
+		<result column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="cname" jdbcType="VARCHAR" property="cname"/>
+	</resultMap>
+	
+	<select id="ccatSelect" parameterType="Bcat" resultMap="ccatMap">
+		SELECT cnum, bnum, anum, cname
+		FROM ccat
+		WHERE anum = #{anum} and bnum= #{bnum}
+	</select>
+ -->
+</mapper>

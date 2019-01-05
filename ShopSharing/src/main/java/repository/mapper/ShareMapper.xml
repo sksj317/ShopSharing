@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="repository.mapper.ShareMapper">
+
+<cache/>
+
+	<resultMap type="Shop" id="shopResultMap">
+		<id column="SHOP_NUM" jdbcType="BIGINT" property="shopNum"></id>
+		<result column="SHOP_NAME" jdbcType="VARCHAR" property="shopName"/>
+		<result column="SHOP_TYPE" jdbcType="VARCHAR" property="shopType"/>
+		<result column="SHOP_POST" jdbcType="VARCHAR" property="shopPost"/>
+		<result column="SHOP_ADDR" jdbcType="VARCHAR" property="shopAddr"/>
+		<result column="SHOP_ADDR2" jdbcType="VARCHAR" property="shopAddr2"/>
+		<result column="SHOP_MONTH" jdbcType="BIGINT" property="shopMonth"/>
+		<result column="SHOP_START_TIME" jdbcType="BIGINT" property="shopStartTime"/>
+		<result column="SHOP_END_TIME" jdbcType="BIGINT" property="shopEndTime"/>
+		<result column="SHOP_LENT_TYPE" jdbcType="VARCHAR" property="shopLentType"/>
+		<result column="SHOP_DETAIL" jdbcType="CLOB" property="shopDetail"/>
+		<result column="SHOP_DEPOSIT" jdbcType="BIGINT" property="shopDeposit"/>
+		<result column="SHOP_LENT_PAY" jdbcType="BIGINT" property="shopLentPay"/>
+		<result column="SHOP_READ_COUNT" jdbcType="BIGINT" property="shopReadCount"/>
+		<result column="SHOP_REG" jdbcType="TIMESTAMP" property="shopReg"/>
+		<result column="SHOP_PERMISSION" jdbcType="VARCHAR" property="shopPermission"/>
+		<result column="member_Id" jdbcType="VARCHAR" property="memberId"/>
+		<result column="SHOP_ORIGINAL_FILE" jdbcType="VARCHAR" property="shopOriginalFile"/>
+		<result column="SHOP_STORED_FILE_NAME" jdbcType="VARCHAR" property="shopStoredFileName"/>
+		
+	</resultMap>
+	
+	<resultMap type="Goods" id="goodsResultMap">
+		<id column="GOODS_NUM" jdbcType="BIGINT" property="goodsNum"/>
+		<id column="GOODS_NAME" jdbcType="VARCHAR" property="goodsName"/>
+		<id column="GOODS_AMOUNT" jdbcType="BIGINT" property="goodsAmount"/>
+		<id column="GOODS_PRICE" jdbcType="BIGINT" property="goodsPrice" />
+		<id column="GOODS_DETAIL" jdbcType="CLOB" property="goodsDetail"/>
+		<id column="GOODS_READ_COUNT" jdbcType="BIGINT" property="goodsReadCount" />
+		<id column="GOODS_REG" jdbcType="TIMESTAMP" property="goodsReg"></id>
+		<id column="GOODS_ORIGINAL_FILE" jdbcType="VARCHAR" property="goodsOriginalFile"></id>
+		<id column="GOODS_STORED_FILE_NAME" jdbcType="VARCHAR" property="goodsStoredFileName"></id>
+		<id column="MEMBER_ID" jdbcType="VARCHAR" property="memberId"></id>
+	</resultMap>
+
+<!-- 테이블 도메인 변경이 갱신되지 않을시 파일이 아니라 연결된 DBMS 아이디(smrit)로 생성한 것인지 확인할 것! -->
+
+<!-- 점포등록 -->
+	<insert id="insertShop" parameterType="Shop"> <!-- 파라미터 타입과 테이블명은 달라도 상관없음(속성이 맞으면 됨) / form에서 입력받지 않은 속성을 적으면 안됨! >> null로 POST 받은 것은 괜찮음--> 
+			INSERT INTO Shop
+			(SHOP_NUM, SHOP_NAME, SHOP_TYPE, SHOP_POST, SHOP_ADDR, SHOP_ADDR2, SHOP_MONTH, SHOP_START_TIME, SHOP_END_TIME, SHOP_LENT_TYPE, SHOP_DETAIL, SHOP_DEPOSIT, SHOP_LENT_PAY, shop_Read_Count,SHOP_REG, SHOP_ORIGINAL_FILE, SHOP_STORED_FILE_NAME,member_Id)
+			values
+			(#{shopNum}, #{shopName}, #{shopType}, #{shopPost}, 
+			#{shopAddr}, #{shopAddr2}, #{shopMonth}, #{shopStartTime}, 
+			#{shopEndTime}, #{shopLentType}, #{shopDetail}, 
+			#{shopDeposit}, #{shopLentPay},#{shopReadCount} ,#{shopReg},#{shopOriginalFile},#{shopStoredFileName},#{memberId})
+			
+				
+	</insert>
+	
+	<select id="selectShopNum" resultType="long">
+			select count(shop_num) from Shop
+	</select>
+
+<!-- 상품등록 -->
+	<insert id="insertGoods" parameterType="Goods"> 
+			INSERT INTO Goods
+			(goods_num, goods_name, goods_amount, goods_price, goods_detail, goods_reg,GOODS_ORIGINAL_FILE,GOODS_STORED_FILE_NAME,MEMBER_ID,GOODS_READ_COUNT)
+			values
+			(#{goodsNum}, #{goodsName}, #{goodsAmount}, #{goodsPrice}, #{goodsDetail}, #{goodsReg},#{goodsOriginalFile},#{goodsStoredFileName},#{memberId},
+			#{goodsReadCount}) 
+	</insert>
+	
+	<select id="selectGoodsNum" resultType="long">
+			select count(goods_num) from Goods
+	</select>
+
+	<select id="selectTimeSharingList" parameterType="Criteria" resultMap="shopResultMap">
+	<!-- 	select *
+		from shop
+		<where>
+			<if test="shopNum !=null">
+				shop_num = #{shopNum}
+			</if>
+		</where> -->
+<!--  		select * from shop
+		order by shop_num desc -->
+ 		<![CDATA[
+			select * from(select rownum rnum,SHOP_NUM,SHOP_NAME,SHOP_TYPE,SHOP_POST,
+			SHOP_ADDR,SHOP_ADDR2,SHOP_MONTH,SHOP_START_TIME,SHOP_END_TIME,SHOP_LENT_TYPE,
+			SHOP_DETAIL,SHOP_DEPOSIT,SHOP_LENT_PAY,SHOP_READ_COUNT,SHOP_REG,SHOP_PERMISSION,SHOP_ORIGINAL_FILE,SHOP_STORED_FILE_NAME,MEMBER_ID
+			from (select * from shop where SHOP_PERMISSION = 1 order by SHOP_NUM desc))  where rnum >= ${pageStart} and rnum <= ${perPageNum}
+		]]> 
+	</select>
+	
+	
+	<update id="selectTimeSharingUpdate" parameterType="Long">
+		update shop set SHOP_READ_COUNT = (SHOP_READ_COUNT+1) where shop_num = #{shopNum}
+	</update>
+
+	<select id="selectTimeSharingDetail" parameterType="Long" resultMap="shopResultMap">
+		select * from shop
+		where
+		shop_num = #{shopNum}
+	</select>
+	
+ 	<select id="listCountCriteria" resultType="Integer">
+		select count(*) from shop
+		
+		
+	</select> 
+	
+	<select id="saleCountCriteria" resultType="Integer">
+		select count(*) from goods
+	</select>
+	
+	<select id="saleList" parameterType="Criteria" resultMap="goodsResultMap">
+		<!-- select * from goods
+		order by goods_num -->
+	<![CDATA[
+		select * from(select rownum rnum,goods_num,GOODS_NAME,GOODS_AMOUNT,
+		GOODS_PRICE,GOODS_DETAIL,GOODS_READ_COUNT,GOODS_REG,GOODS_ORIGINAL_FILE
+		,GOODS_STORED_FILE_NAME,MEMBER_ID from (select * from goods where GOODS_PERMISSION = 1 order by goods_num desc)) where rnum >= ${pageStart} and rnum <= ${perPageNum}
+	]]> 
+	</select>
+	
+	<update id="saleListDetailCountUpdate" parameterType="Long">
+		update goods set GOODS_READ_COUNT = (GOODS_READ_COUNT+1) where goods_num = #{goodsNum}
+	</update>
+	
+	<select id="saleListDetail" parameterType="Long" resultMap="goodsResultMap">
+		select * from goods
+		where goods_num = #{goods_num}
+	</select>
+	
+</mapper>
+
+<!-- 	
+	<insert id="insertComment" parameterType="Comment">
+		INSERT INTO comment1(comment_no, user_id, comment_content, reg_date)
+		values(#{commentNo}, #{userId}, #{commentContent}, #{regDate}) 
+	</insert>
+	
+	<resultMap type="Comment" id="baseResultMap">
+		<id column="comment_no" jdbcType="BIGINT" property="commentNo" />
+		<result column="user_id" jdbcType="VARCHAR" property="userId" />
+		<result column="reg_date" jdbcType="TIMESTAMP" property="regDate" />
+		<result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+	</resultMap>
+	
+	<select id="selectCommentByCondition" parameterType="Comment" resultMap="baseResultMap">
+		SELECT comment_no, user_id, comment_content, reg_date
+		FROM comment1
+		<where>
+			<if test="commentNo != null">
+				comment_no = #{commentNo}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateComment" parameterType="Comment">
+		UPDATE comment1
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userId != null">
+				user_id = #{userId},
+			</if>
+			<if test="commentContent != null">
+				comment_content = #{commentContent}
+			</if>			
+			WHERE comment_no = #{commentNo}
+		</trim>
+	</update>
+	
+	<delete id="deleteComment" parameterType="long">
+		DELETE FROM comment1
+		WHERE comment_no = #{commentNo}
+	</delete>
+	
+	<resultMap type="Reply" id="baseResultMap1">
+		<id column="reply_no" jdbcType="BIGINT" property="replyNo"/>
+		<result column="comment_no" jdbcType="BIGINT" property="commentNo"/>
+		<result column="user_id" jdbcType="VARCHAR" property="userId"/>
+		<result column="reply_content" jdbcType="VARCHAR" property="replyContent"/>
+		<result column="reg_date" jdbcType="TIMESTAMP" property="regDate"/>
+	</resultMap>
+	
+	<select id="ajaxSelect1" resultMap="baseResultMap">		
+		SELECT comment_no, user_id, comment_content, reg_date
+		FROM comment1
+	</select>
+	
+	<select id="ajaxSelect2" resultMap="baseResultMap1">
+		SELECT reply_no, comment_no, reply_content, reg_date, user_id
+		FROM reply
+	</select>
+	
+	<resultMap type="Member" id="memberMap">
+		<constructor>
+		<idArg column="id" javaType="long"/>
+		<arg column="email" javaType="string"/>
+		<arg column="password" javaType="string"/>
+		<arg column="name" javaType="string"/>
+		<arg column="regdate" javaType="date"/>		
+		</constructor>
+	</resultMap>
+	
+	<select id="memberSelect" parameterType="Member" resultMap="memberMap">
+		SELECT id, email, password, name, regdate
+		FROM member
+		WHERE id = #{memberId}
+	</select>
+	
+	<resultMap type="Acat" id="acatMap">
+		<id column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="aname" jdbcType="VARCHAR" property="aname"/>
+	</resultMap>
+	
+	<select id="acatSelect" parameterType="Acat" resultMap="acatMap">
+		SELECT anum, aname
+		FROM acat
+	</select>
+	
+	<resultMap type="Bcat" id="bcatMap">
+		<id column="bnum" jdbcType="BIGINT" property="bnum"/>
+		<result column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="bname" jdbcType="VARCHAR" property="bname"/>
+	</resultMap>
+	
+	<select id="bcatSelect" parameterType="Acat" resultMap="bcatMap">
+		SELECT bnum, anum, bname
+		FROM bcat
+		WHERE anum = #{anum}
+	</select>
+	
+	<resultMap type="Ccat" id="ccatMap">
+		<id column="cnum" jdbcType="BIGINT" property="cnum"/>
+		<result column="bnum" jdbcType="BIGINT" property="bnum"/>
+		<result column="anum" jdbcType="BIGINT" property="anum"/>
+		<result column="cname" jdbcType="VARCHAR" property="cname"/>
+	</resultMap>
+	
+	<select id="ccatSelect" parameterType="Bcat" resultMap="ccatMap">
+		SELECT cnum, bnum, anum, cname
+		FROM ccat
+		WHERE anum = #{anum} and bnum= #{bnum}
+	</select>
+ -->
